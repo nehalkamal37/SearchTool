@@ -123,14 +123,16 @@ class DrugController extends Controller
     public function showSearchPage()
 {
     // إحضار جميع الأسماء المميزة من الجدول
-    $drugNames = DB::table('scripts')->distinct()->pluck('Drug_Name');
+    $drugNames = DB::table('drugs')->distinct()->pluck('drug_name');
+
+   // $drugNames = DB::table('scripts')->distinct()->pluck('Drug_Name');
     $insurances = DB::table('scripts')->distinct()->pluck('Ins');
-    $ndcs = DB::table('scripts')->distinct()->pluck('NDC');
+    $ndcs = DB::table('drugs')->pluck('ndc');
 
     return view('search', compact('drugNames', 'insurances', 'ndcs'));
 }
 
-public function filterData(Request $request)
+public function filterData2(Request $request)
 {
     $drugName = $request->input('drug_name');
 
@@ -140,16 +142,66 @@ public function filterData(Request $request)
             'ndcs' => [],
         ]);
     }
+    $filteredDrugData2 = DB::table('drugs')
+    ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
+    ->get();
 
-    $filteredData = DB::table('scripts')
+    $filteredDrugData = DB::table('drugs')
+    ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
+    ->get();
+
+
+
+$filteredScriptData = DB::table('scripts')
+    ->where(DB::raw('TRIM(Drug_Name)'), trim($drugName))
+    ->get();
+   // $drugName = preg_replace('/\s+/', ' ', trim($drugName));
+
+
+
+        \Log::info('Filtered Drugs:', $filteredDrugData->toArray());
+
+   /* $filteredDrugData = DB::table('drugs')
+        ->where('drug_name', $drugName)
+        ->get();
+        $filteredScriptData = DB::table('scripts')
         ->where('Drug_Name', $drugName)
         ->get();
+        */
   //dd($filteredData);
     // Debug: Check what data is fetched
     return response()->json([
-        'filteredData' => $filteredData,
-        'insurances' => $filteredData->pluck('Ins')->unique(),
-        'ndcs' => $filteredData->pluck('NDC')->unique(),
+        'filteredData' => $filteredScriptData,
+        'insurances' => $filteredScriptData->pluck('Ins')->unique(),
+        'ndcs' => $filteredDrugData->pluck('ndc')->all(),
+    ]);
+}
+
+public function filterData(Request $request)
+{
+    $drugName = $request->input('drug_name');
+
+    // Normalize spaces: trim and replace multiple spaces with a single space
+   // $drugName = preg_replace('/\s+/', '', trim($drugName));
+    // Result: "CLOBETASOLGEL0.05%"
+//        dd($drugName); 
+    \Log::info('Normalized Drug Name:', [$drugName]); // Log the normalized name
+
+    $filteredDrugData = DB::table('drugs')
+    ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
+    ->get();
+
+    $filteredScriptData = DB::table('scripts')
+    ->where(DB::raw('TRIM(Drug_Name)'), trim($drugName))
+    ->get();
+
+    \Log::info('Filtered Drug Data:', $filteredDrugData->toArray());
+    \Log::info('Filtered Script Data:', $filteredScriptData->toArray());
+
+    return response()->json([
+        'filteredData' => $filteredScriptData,
+        'insurances' => $filteredScriptData->pluck('Ins')->unique()->values(),
+        'ndcs' => $filteredDrugData->pluck('ndc')->unique()->values(),
     ]);
 }
 

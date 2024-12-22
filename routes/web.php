@@ -19,7 +19,7 @@ use App\Http\Controllers\DrugController;
 Route::get('/', function () {
     return view('welcome');
 });
-   // Route::get('search',[searchController::class,'index'])->name('find');   //used one 
+    Route::get('search',[DrugController::class,'index'])->name('searchPage');   //used to show data in json format
     Route::Post('searchDrug',[searchController::class,'search'])->name('search');  //this is the used method to handle search
 
    Route::post('/get-dependent-data', [searchController::class, 'getDependentData'])->name('getDependentData');

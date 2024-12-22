@@ -37,6 +37,7 @@
     </form>
 
     <script>
+        // main code
         $(document).ready(function () {
             function updateOptions(selector, options) {
                 let element = $(selector);
@@ -88,5 +89,54 @@
             });
         });
     </script>
+    <script>
+function updateOptions(selector, options) {
+    let element = $(selector);
+    element.empty();
+    element.append('<option value="">-- Select --</option>');
+
+    // Append each option without filtering
+    options.forEach(function (option) {
+        element.append('<option value="' + option + '">' + option + '</option>');
+    });
+
+    console.log(`Updated ${selector} with options:`, options);
+}
+</script>
+    <script>
+        $('#drugName').on('change', function () {
+    let drugName = $(this).val().trim(); // Trim spaces from the input
+    console.log('Selected Drug Name (trimmed):', drugName);
+
+    if (drugName) {
+        $.ajax({
+            url: '/filter-data',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                drug_name: drugName,
+            },
+            success: function (response) {
+                console.log('Response:', response);
+
+                if (response.insurances && response.ndcs) {
+                    $('#relatedInputs').show();
+                } else {
+                    $('#relatedInputs').hide();
+                }
+
+                updateOptions('#insurance', response.insurances);
+                updateOptions('#ndc', response.ndcs);
+            },
+            error: function (error) {
+                console.error('AJAX Error:', error);
+            }
+        });
+    } else {
+        $('#relatedInputs').hide();
+    }
+});
+
+        </script>
 </body>
 </html>

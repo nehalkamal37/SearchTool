@@ -32,7 +32,7 @@
                     <td>{{ $request->ndc }}</td>
                     <td>{{ $class }}</td>
                     @foreach ($data as $item)
-                    <td>{{$item->Date }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->Date)->format('m/d/Y')  }}</td>
                     <td>{{$item->Script }}</td>
                     <td>{{$item->Net_Profit }}</td>
 
@@ -106,12 +106,13 @@
                      @if($i->Drug_Name == $request->drug_name && $i->NDC == $request->ndc && $i->Ins == $request->insurance)
                         
                         @else
-                        <td>{{ $i->Class }}</td>
+                    <td>{{ $i->Class }}</td>
                     <td>{{ $i->Drug_Name }}</td>
                     <td>{{ $i->NDC }}</td>
                     <td>{{ $i->Ins}}</td>
                     <td>{{ $i->Script}}</td>
-                    <td>{{ $i->Date}}</td>
+                    <td>{{ \Carbon\Carbon::createFromFormat('d/m/Y H:i', $i->Date)->format('m/d/Y') }}</td>
+
                     <td>{{ $i->RxCui}}</td>
                     <td>{{ $i->Net_Profit}}</td>
 
@@ -177,7 +178,7 @@
                      @if($drug->drug_name == $request->drug_name && $drug->ndc == $request->ndc )
                         
                         @else
-                        <td>{{ $drug->drug_class }}</td>
+                    <td>{{ $drug->drug_class }}</td>
                     <td>{{ $drug->drug_name }}</td>
                     <td>{{ $drug->ndc }}</td>
                     <td>{{ $drug->form}}</td>
