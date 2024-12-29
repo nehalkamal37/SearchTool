@@ -1,52 +1,89 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hellow ,Sign Up  </title>
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="{{asset('auth/fonts/material-icon/css/material-design-iconic-font.min.css')}}">
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+    <!-- Main css -->
+    <link rel="stylesheet" href="{{ asset('auth/css/style.css')}}">
+</head>
+<body>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+    <div class="main">
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+        <!-- Sign up form -->
+        <section class="signup">
+            <div class="container">
+                <div class="signup-content">
+                    <div class="signup-form">
+                        <h2 class="form-title">Sign up</h2>
+                            <form method="POST" class="register-form" id="register-form" action="{{ route('register') }}">
+                                @csrf
+                        
+                            <div class="form-group">
+                                <label for="name"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                                <input type="text" name="name" value="{{ old('name') }}" id="name" placeholder="Your Name"/>
+                            </div>
+                            @error('name')
+                            <span style="color: red; font-size: 14px;">{{ $message }}</span>
+                            @enderror
+                            <div class="form-group">
+                                <label for="email"><i class="zmdi zmdi-email"></i></label>
+                                <input type="email" name="email"   value="{{ old('email') }}" id="email" placeholder="Your Email"/>
+                            </div>@error('email')
+                            <span style="color: red; font-size: 14px;">{{ $message }}</span>
+                            @enderror
+                            <div class="form-group">
+                                <label for="pass"><i class="zmdi zmdi-lock"></i></label>
+                                <input type="password" name="password" id="pass" placeholder="Password"/>
+                            </div>@error('password')
+                            <span style="color: red; font-size: 14px;">{{ $message }}</span>
+                            @enderror
+                            <div class="form-group">
+                                <label for="re-pass"><i class="zmdi zmdi-lock-outline"></i></label>
+                                <input type="password" name="password_confirmation" id="re_pass" placeholder="Repeat your password"/>
+                            </div>@error('password_confirmation')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                           
+                            <div class="form-group">
+                                <select id="role" name="role" required 
+                                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                    <option value="customer">Customer</option>
+                                    <option value="pharmacist">Pharmacist</option>
+                                    <option value="administrator">Administrator</option>
+                                    <option value="technician">Technician</option>
+                                    <option value="inventory_manager">Inventory Manager</option>
+                                </select>
+                            </div>
+                            @error('role')
+                            <span style="color: red; font-size: 14px;">{{ $message }}</span>
+                            @enderror
+                          
+                            
+                            <div class="form-group form-button">
+                                <input type="submit" name="register" id="signup" class="form-submit" value="Register"/>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="signup-image">
+                        <figure><img src="{{ asset('auth/images/signup-image.jpg')}}" alt="sing up image"></figure>
+                        <a href="{{ route('login')}}" class="signup-image-link">I am already member</a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+    </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    <!-- JS -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="js/main.js"></script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>

@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-
+        //return redirect()->route('pharmacist.dashboard');
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

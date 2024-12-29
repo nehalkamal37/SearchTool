@@ -17,7 +17,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/dashboard';
+    public const HOME = '/home';
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
@@ -37,4 +37,28 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
         });
     }
+
+protected function redirectTo($request)
+{
+    if (Auth::check()) {
+        $role = Auth::user()->role; // Fetch user's role
+
+        switch ($role) {
+            case 'pharmacist':
+                return '/pharmacist/dashboard';
+            case 'administrator':
+                return '/pharmacist/dashboard';
+            case 'technician':
+                return '/technician/dashboard';
+            case 'inventory_manager':
+                return '/inventory/dashboard';
+            default:
+                return self::HOME; // Default fallback for unknown roles
+        }
+    }
+
+    return '/login'; // Redirect to login if not authenticated
+}
+
+
 }

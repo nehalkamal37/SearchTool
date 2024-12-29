@@ -125,14 +125,64 @@ class DrugController extends Controller
     // إحضار جميع الأسماء المميزة من الجدول
     $drugNames = DB::table('drugs')->distinct()->pluck('drug_name');
 
-   // $drugNames = DB::table('scripts')->distinct()->pluck('Drug_Name');
-    $insurances = DB::table('scripts')->distinct()->pluck('Ins');
-    $ndcs = DB::table('drugs')->pluck('ndc');
+    //$insurances = DB::table('scripts')->distinct()->pluck('Ins');
 
-    return view('search', compact('drugNames', 'insurances', 'ndcs'));
-}
+    // Get distinct drug names
+        $drugNames = DB::table('drugs')->distinct()->pluck('drug_name');
+    
+        // Get distinct insurance short names
+        $insuranceShortNames = DB::table('scripts')->distinct()->pluck('Ins');
+    
+        // Map short names to full names
+        $insuranceMapping = [
+            'AL' => 'Aetna (AL)',
+            'BW' => 'Aetna (BW)',
+            'AD' => 'Aetna Medicare (AD)',
+            'AF' => 'Anthem BCBS (AF)',
+            'DS' => 'Blue Cross Blue Shield (DS)',
+            'CA' => 'Blue Shield Medicare (CA)',
+            'FQ' => 'Capital Rx (FQ)',
+            'BF' => 'Caremark (BF)',
+            'ED' => 'CatalystRx (ED)',
+            'AM' => 'Cigna (AM)',
+            'BO' => 'Default Claim Format (BO)',
+            'AP' => 'Envision Rx Options (AP)',
+            'CG' => 'Express Scripts (CG)',
+            'BI' => 'Horizon (BI)',
+            'AJ' => 'Humana Medicare (AJ)',
+            'BP' => 'informedRx (BP)',
+            'AO' => 'MEDCO HEALTH (AO)',
+            'AC' => 'MEDCO MEDICARE PART D (AC)',
+            'AQ' => 'MEDGR (AQ)',
+            'CC' => 'MY HEALTH LA (CC)',
+            'AG' => 'Navitus Health Solutions (AG)',
+            'AH' => 'OptumRx (AH)',
+            'AS' => 'PACIFICARE LIFE AND H (AS)',
+            'FJ' => 'Paramount Rx (FJ)',
+            'X ' => 'PF - DEFAULT (X )',
+            'EA' => 'Pharmacy Data Management (EA)',
+            'DW' => 'PHCS (DW)',
+            'AX' => 'PINNACLE (AX)',
+            'BN' => 'Prescription Solutions (BN)',
+            'AA' => 'Tri-Care Express Scripts (AA)',
+            'AI' => 'United Healthcare (AI)'
+        ];
+    
+        // Replace short names with full names
+        $insurances = $insuranceShortNames->map(function ($shortName) use ($insuranceMapping) {
+            return $insuranceMapping[$shortName] ?? $shortName; // Fallback to short name if no mapping found
+        });
+    
+        // Get distinct NDCs
+        $ndcs = DB::table('drugs')->pluck('ndc');
+    
+        // Pass data to the view
+        return view('search', compact('drugNames', 'insurances', 'ndcs'));
+    }
+    
+   
 
-public function filterData2(Request $request)
+public function filterDataold(Request $request)
 {
     $drugName = $request->input('drug_name');
 
@@ -151,8 +201,7 @@ public function filterData2(Request $request)
     ->get();
 
 
-
-$filteredScriptData = DB::table('scripts')
+     $filteredScriptData = DB::table('scripts')
     ->where(DB::raw('TRIM(Drug_Name)'), trim($drugName))
     ->get();
    // $drugName = preg_replace('/\s+/', ' ', trim($drugName));
@@ -170,10 +219,11 @@ $filteredScriptData = DB::table('scripts')
         */
   //dd($filteredData);
     // Debug: Check what data is fetched
+
     return response()->json([
         'filteredData' => $filteredScriptData,
         'insurances' => $filteredScriptData->pluck('Ins')->unique(),
-        'ndcs' => $filteredDrugData->pluck('ndc')->all(),
+        'ndcs' => $filteredDrugData->pluck('ndc')->unique(),
     ]);
 }
 
@@ -183,7 +233,6 @@ public function filterData(Request $request)
 
     // Normalize spaces: trim and replace multiple spaces with a single space
    // $drugName = preg_replace('/\s+/', '', trim($drugName));
-    // Result: "CLOBETASOLGEL0.05%"
 //        dd($drugName); 
     \Log::info('Normalized Drug Name:', [$drugName]); // Log the normalized name
 
@@ -198,6 +247,11 @@ public function filterData(Request $request)
     \Log::info('Filtered Drug Data:', $filteredDrugData->toArray());
     \Log::info('Filtered Script Data:', $filteredScriptData->toArray());
 
+    
+   // $ndcs = $filteredDrugData->pluck('ndc')->unique();
+    $insurances = $filteredScriptData->pluck('Ins')->unique();
+    $ndc_data=Drug::where('drug_name',$drugName)->get();
+    
     return response()->json([
         'filteredData' => $filteredScriptData,
         'insurances' => $filteredScriptData->pluck('Ins')->unique()->values(),
@@ -205,5 +259,73 @@ public function filterData(Request $request)
     ]);
 }
 
+public function filterData2(Request $request)
+{
+    $drugName = $request->input('drug_name');
+
+    if (!$drugName) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Drug name is required',
+            'insurances' => [],
+            'ndcs' => [],
+        ]);
+    }
+
+    $filteredDrugData = DB::table('drugs')
+        ->where('drug_name', $drugName)
+        ->get();
+
+    return response()->json([
+        'success' => true,
+        'insurances' => $filteredDrugData->pluck('insurance')->unique(),
+        'ndcs' => $filteredDrugData->pluck('ndc')->unique(),
+    ]);
+  /*  if ($drugName) {
+        $filteredDrugData = DB::table('drugs')
+            ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
+            ->get();
+
+        $ndcs = $filteredDrugData->pluck('ndc')->unique();
+        $ndcs=Drug::where('drug_name',$drugName)->get();
+    }
+    //\Log::info('Filtered Drug Data:', $filteredDrugData->toArray());
+    return view('search', [
+        'drugNames' => DB::table('drugs')->pluck('drug_name')->unique(),
+        'ndcs' => Drug::where('drug_name',$request->input('drug_name'))->get(),
+        'selectedDrug' => $drugName,
+    ]);
+
+    */
+}
+
+
+public function processNdc(Request $request)
+{
+    $ndc = $request->query('ndc'); // Get the NDC from the query string
+
+    if (!$ndc) {
+        return back()->with('error', 'No NDC provided.');
+    }
+
+    // Step 1: Find the drug name related to the provided NDC
+    $data = Drug::where('ndc', $ndc)->first(); // Get the first matching record
+    if (!$data) {
+        return back()->with('error', 'No drug found for the provided NDC.');
+    }
+
+    $drugName = $data->drug_name; // Extract the drug name
+
+    // Step 2: Find all rows related to the drug name
+    $relatedRows = Drug::where('drug_name', $drugName) ->distinct()->get();; // Get all records for the same drug name
+
+    // Step 3: Return the data to the view
+    return view('ndcResult', [
+        'selectedNdc' => $ndc, // The initially selected NDC
+        'drugName' => $drugName, // The drug name related to the selected NDC
+        'relatedRows' => $relatedRows, // All related rows (full columns)
+        'message' => 'NDC processed successfully.',
+    ]);
+}
 
 }

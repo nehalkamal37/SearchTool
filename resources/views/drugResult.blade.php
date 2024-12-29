@@ -9,6 +9,12 @@
 <body>
 <div class="container mt-5">
     <h2 class="mb-4">Search Results</h2>
+    @if($data->isEmpty())
+    <div class="alert alert-warning" role="alert">
+        No insurance data available for {{$request->drug_name}} with NDC {{$request->ndc}}
+    </div>
+
+    @endif
 <a href="{{route('searchPage')}}"><button > Go Back</button></a>
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
@@ -17,10 +23,17 @@
                 <th>Ins Results</th>
                 <th>NDC Results</th>
                 <th>class </th>
+                @if((!$data ))
                 <th>Date </th>
                 <th>Script </th>
                 <th>Net_Profit </th>
-
+@endif
+@if(isset($drug_data))
+<th>form </th>
+<th>strength </th>
+<th>mfg </th>
+<th>acq </th>
+@endif
 
             </tr>
         </thead>
@@ -31,18 +44,21 @@
                     <td>{{ $request->insurance }}</td>
                     <td>{{ $request->ndc }}</td>
                     <td>{{ $class }}</td>
-                    @foreach ($data as $item)
+                    @if($data)
+                      @foreach ($data as $item)
                     <td>{{ \Carbon\Carbon::parse($item->Date)->format('m/d/Y')  }}</td>
                     <td>{{$item->Script }}</td>
                     <td>{{$item->Net_Profit }}</td>
 
                     @endforeach
+                    @endif
 
 @if(isset($drug_data))
 @foreach ($drug_data as $item)
 <td>{{$item->form }}</td>
-<td>{{$item->length }}</td>
+<td>{{$item->strength }}</td>
 <td>{{$item->mfg }}</td>
+<td>{{$item->acq }}</td>
 
 @endforeach
 @endif
@@ -78,7 +94,29 @@
             
         </tbody>
     </table>
-    <h2 class="mb-4">Alternatives Results</h2>
+
+    
+    <h3>Alternative Drugs in the Same Class</h3>
+<p>Found {{ $script->count()  }} alternatives in the same class.</p>
+
+<form id="filterForm" method="post" action="{{ route('searchDrug') }}">
+    @csrf
+    <input type="hidden" name="drug_name" value="{{ $request->drug_name }}">
+    <input type="hidden" name="ndc" value="{{ $request->ndc }}">
+    <input type="hidden" name="insurance" value="{{ $request->insurance }}">
+
+    <label for="sort_by">Sort Alternatives By:</label>
+    <select name="sort_by" id="sort_by" class="form-select" onchange="this.form.submit()">
+        <option value="">-- Select --</option>
+        <option value="net_profit_desc" {{ request('sort_by') === 'net_profit_desc' ? 'selected' : '' }}>
+            Highest Net Profit
+        </option>
+        <option value="awp_asc" {{ request('sort_by') === 'awp_asc' ? 'selected' : '' }}>
+            Lowest AWP
+        </option>
+    </select>
+</form>
+
 
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
@@ -89,13 +127,13 @@
                 <th>Inurance </th>
                 <th>Script </th>
                 <th>Date </th>
-
                 <th>RxCui </th>
                 <th>Net_Profit </th>
 
             </tr>
         </thead>
         <tbody>
+            
                 <tr>
                     <!-- Drug Name -->
                   
@@ -153,17 +191,18 @@
         </tbody>
     </table>
 
-    @if(isset($drugs))
+    @if(($drugs))
+    <h5>Alternative Drugs with no insurance Data</h5>
+
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
                 <th>class Name</th>
                 <th>drug Name</th>
                 <th>drug NDC</th>
-                <th> </th>
-                <th>Script </th>
-                <th>RxCui </th>
-                <th>Net_Profit </th>
+                <th>form </th>
+                <th>strength </th>
+                <th>mfg </th>
 
             </tr>
         </thead>
@@ -183,7 +222,8 @@
                     <td>{{ $drug->ndc }}</td>
                     <td>{{ $drug->form}}</td>
                     <td>{{ $drug->strength}}</td>
-            
+                    <td>{{ $drug->mfg }}</td>
+
 
                     </tr>
                         @endif
