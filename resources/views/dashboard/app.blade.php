@@ -40,10 +40,15 @@
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-dark opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand px-4 py-3 m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">
-        <img src="{{ asset('dashboard/assets/img/logo.png')}}" 
-        class="navbar-brand-img" 
-        style="width: 150px; height: auto;" 
-        alt="main_logo">
+      
+     <style>
+      .navbar-brand-img {
+          width: 250px; /* Adjust size for larger logo */
+          height: auto; /* Maintain aspect ratio */
+      }
+  </style>
+<img src="{{ asset('dashboard/assets/img/logo.png')}}" class="navbar-brand-img" alt="main_logo">
+  
    
         <span class="ms-1 text-sm text-dark"></span>
       </a>

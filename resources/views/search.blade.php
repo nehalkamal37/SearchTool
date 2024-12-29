@@ -41,7 +41,7 @@
 
 <body>
     <div style="margin-to: -1333px">
-    <h1>Medication Guiding Tool 💊</h1>
+    <h1>CDI Medication Guiding Tool 💊</h1>
     </div>
    {{-- old one 
     <form id="searchForm" method="post" action="{{ route('search')}}">
