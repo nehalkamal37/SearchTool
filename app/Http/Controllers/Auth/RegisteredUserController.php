@@ -61,16 +61,18 @@ class RegisteredUserController extends Controller
         */
         switch ($user->role) {
             case 'pharmacist':
-                return redirect()->route('pharmacist.dashboard');
+                return redirect(RouteServiceProvider::HOME); // Fallback route
+
+               // return redirect()->route('pharmacist.dashboard');
             case 'administrator':
-                return redirect()->route('pharmacist.dashboard');
+                return redirect(RouteServiceProvider::HOME); // Fallback route
               //  return redirect()->route('admin.dashboard');
 
             case 'technician':
-                return redirect()->route('pharmacist.dashboard');
+                return redirect(RouteServiceProvider::HOME); // Fallback route
                 //   return redirect()->route('technician.dashboard');
             case 'inventory_manager':
-                return redirect()->route('pharmacist.dashboard');
+                return redirect(RouteServiceProvider::HOME); // Fallback route
                 //   return redirect()->route('inventory.dashboard');
             default:
                 return redirect(RouteServiceProvider::HOME); // Fallback route

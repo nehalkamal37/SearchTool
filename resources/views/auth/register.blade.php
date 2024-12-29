@@ -58,8 +58,8 @@
                                     <option value="customer">Customer</option>
                                     <option value="pharmacist">Pharmacist</option>
                                     <option value="administrator">Administrator</option>
-                                    <option value="technician">Technician</option>
-                                    <option value="inventory_manager">Inventory Manager</option>
+                                    <option value="technician">technician</option>
+                                    <option value="inventory_manager">inventory_manager</option>
                                 </select>
                             </div>
                             @error('role')

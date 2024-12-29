@@ -17,7 +17,7 @@
         <link href="{{asset('searchPage/css/main.css')}}" rel="stylesheet" />
       
 </head>
-<a href="{{route('pharmacist.dashboard')}}" class="btn btn-secondary w-10">Dashboard</a>
+<a href="{{route('dash')}}" class="btn btn-secondary w-10">Dashboard</a>
 
 <style>
     body {
