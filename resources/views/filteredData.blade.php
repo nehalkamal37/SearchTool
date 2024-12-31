@@ -12,10 +12,11 @@
     <a href="{{route('searchPage')}}"><button > Go Out</button></a>
 
     <h3>Alternative Drugs due to {{ $sortBy}}    </h3>
-    <p>Found {{ $scriptData->count() }} alternatives in the same class.</p>
+    <p>Found {{ $scriptData->count() }} .</p>
 
     <table class="table table-striped">
         <thead>
+            @if($sortBy === 'net_profit_desc')
             <tr>
                 <th>Class Name</th>
                 <th>Drug Name</th>
@@ -39,9 +40,45 @@
                     <td>{{ $script->RxCui }}</td>
                     <td>{{ $script->Net_Profit }}</td>
                 </tr>
+
+                
             @endforeach
+            @endif
         </tbody>
     </table>
+    
+    <table class="table table-striped">
+        <thead>
+            @if($sortBy == 'awp_asc')
+            <tr>
+                <th>Class Name</th>
+                <th>Drug Name</th>
+                <th>Drug NDC</th>
+                <th>form</th>
+                <th>awp</th>
+                <th>strength</th>
+                <th>RxCui</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($scriptData as $script)
+                <tr>
+                    <td>{{ $script->drug_class }}</td>
+                    <td>{{ $script->drug_name }}</td>
+                    <td>{{ $script->ndc }}</td>
+                    <td>{{ $script->form }}</td>
+                    <td>{{ $script->awp }}</td>
+                    <td>{{ $script->strength }}</td>
+                    <td>{{ $script->rxCUI }}</td>
+                </tr>
+
+                
+            @endforeach
+            @endif
+        </tbody>
+    </table>
+    
+   
     <p> {{ $scriptData->count()==1 ? 'No alternatives found for the provided inputs.' :'' }}
         </p>
 

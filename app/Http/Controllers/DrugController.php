@@ -182,121 +182,64 @@ class DrugController extends Controller
     
    
 
-public function filterDataold(Request $request)
-{
-    $drugName = $request->input('drug_name');
 
-    if (!$drugName) {
-        return response()->json([
-            'insurances' => [],
-            'ndcs' => [],
-        ]);
-    }
-    $filteredDrugData2 = DB::table('drugs')
-    ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
-    ->get();
-
-    $filteredDrugData = DB::table('drugs')
-    ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
-    ->get();
-
-
-     $filteredScriptData = DB::table('scripts')
-    ->where(DB::raw('TRIM(Drug_Name)'), trim($drugName))
-    ->get();
-   // $drugName = preg_replace('/\s+/', ' ', trim($drugName));
-
-
-
-        \Log::info('Filtered Drugs:', $filteredDrugData->toArray());
-
-   /* $filteredDrugData = DB::table('drugs')
-        ->where('drug_name', $drugName)
-        ->get();
-        $filteredScriptData = DB::table('scripts')
-        ->where('Drug_Name', $drugName)
-        ->get();
-        */
-  //dd($filteredData);
-    // Debug: Check what data is fetched
-
-    return response()->json([
-        'filteredData' => $filteredScriptData,
-        'insurances' => $filteredScriptData->pluck('Ins')->unique(),
-        'ndcs' => $filteredDrugData->pluck('ndc')->unique(),
-    ]);
-}
 
 public function filterData(Request $request)
 {
     $drugName = $request->input('drug_name');
+    $insurance = $request->input('insurance'); // Retrieve insurance from the request
+
+    // Log inputs for debugging
+    \Log::info('Drug Name:', [$drugName]);
+    \Log::info('Insurance:', [$insurance]);
 
     // Normalize spaces: trim and replace multiple spaces with a single space
-   // $drugName = preg_replace('/\s+/', '', trim($drugName));
-//        dd($drugName); 
     \Log::info('Normalized Drug Name:', [$drugName]); // Log the normalized name
 
+    // Retrieve filtered data from drugs table
     $filteredDrugData = DB::table('drugs')
-    ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
-    ->get();
+        ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
+        ->get();
 
+    // Retrieve filtered data from scripts table
     $filteredScriptData = DB::table('scripts')
-    ->where(DB::raw('TRIM(Drug_Name)'), trim($drugName))
-    ->get();
+        ->where(DB::raw('TRIM(Drug_Name)'), trim($drugName))
+        ->get();
 
     \Log::info('Filtered Drug Data:', $filteredDrugData->toArray());
     \Log::info('Filtered Script Data:', $filteredScriptData->toArray());
 
-    
-   // $ndcs = $filteredDrugData->pluck('ndc')->unique();
+    // Get unique insurances from filtered script data
     $insurances = $filteredScriptData->pluck('Ins')->unique();
-    $ndc_data=Drug::where('drug_name',$drugName)->get();
-    
+
+    // Get unique NDCs that match the selected drug name and insurance
+    $ndcs = Script::where('Drug_Name', $drugName)
+        ->where(function ($query) use ($insurance) {
+            $query->where('Ins', $insurance) // Direct match
+                  ->orWhere('Ins', 'LIKE', "%($insurance)"); // Match short name
+        })
+        ->pluck('NDC');
+
+        $ndcs = Script::where('Drug_Name', $drugName)
+            ->where('Ins', $insurance) // Direct match
+                  ->orWhere('Ins', 'LIKE', "%($insurance)") // Match short name
+            ->pluck('NDC');
+
+    // Fallback to NDCs from filteredDrugData if no NDCs were found
+    if ($ndcs->isEmpty()) {
+        $ndcs = Script::where('Drug_Name', $drugName)
+        ->where('Ins', $insurance) // Direct match
+              ->orWhere('Ins', 'LIKE', "%($insurance)") // Match short name
+        ->pluck('NDC');
+       $ndcs = $filteredScriptData->pluck('NDC')->unique()->values();
+    }
+
+    // Return the response as JSON
     return response()->json([
         'filteredData' => $filteredScriptData,
-        'insurances' => $filteredScriptData->pluck('Ins')->unique()->values(),
-        'ndcs' => $filteredDrugData->pluck('ndc')->unique()->values(),
+        'insurances' => $insurances->values(),
+        'ndcs' => $ndcs,
     ]);
-}
-
-public function filterData2(Request $request)
-{
-    $drugName = $request->input('drug_name');
-
-    if (!$drugName) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Drug name is required',
-            'insurances' => [],
-            'ndcs' => [],
-        ]);
-    }
-
-    $filteredDrugData = DB::table('drugs')
-        ->where('drug_name', $drugName)
-        ->get();
-
-    return response()->json([
-        'success' => true,
-        'insurances' => $filteredDrugData->pluck('insurance')->unique(),
-        'ndcs' => $filteredDrugData->pluck('ndc')->unique(),
-    ]);
-  /*  if ($drugName) {
-        $filteredDrugData = DB::table('drugs')
-            ->where(DB::raw('TRIM(drug_name)'), trim($drugName))
-            ->get();
-
-        $ndcs = $filteredDrugData->pluck('ndc')->unique();
-        $ndcs=Drug::where('drug_name',$drugName)->get();
-    }
-    //\Log::info('Filtered Drug Data:', $filteredDrugData->toArray());
-    return view('search', [
-        'drugNames' => DB::table('drugs')->pluck('drug_name')->unique(),
-        'ndcs' => Drug::where('drug_name',$request->input('drug_name'))->get(),
-        'selectedDrug' => $drugName,
-    ]);
-
-    */
 }
 
 

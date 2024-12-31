@@ -3,10 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DrugController;
 use App\Http\Controllers\searchController;
+use App\Http\Controllers\streamController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\pharmacistController;
 use App\Http\Controllers\dashboard\userController;
 use App\Http\Controllers\dashboard\drugsController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\dashboard\scriptsController;
 
 /*
@@ -86,5 +87,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::view('/home','dashboard.dashboard')->middleware('auth')->name('dash');
+
+Route::get('/stream', [streamController::class, 'index'])->name('drugs.index');
 
 require __DIR__.'/auth.php';
