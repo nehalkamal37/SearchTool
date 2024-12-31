@@ -251,8 +251,14 @@ public function processNdc(Request $request)
         return back()->with('error', 'No NDC provided.');
     }
 
+    // Normalize the input NDC (remove any dashes)
+    $normalizedInputNdc = str_replace('-', '', $ndc);
+
     // Step 1: Find the drug name related to the provided NDC
-    $data = Drug::where('ndc', $ndc)->first(); // Get the first matching record
+    $data = Drug::whereRaw("REPLACE(ndc, '-', '') = ?", [$normalizedInputNdc])->first();
+    
+    // Step 1: Find the drug name related to the provided NDC
+   // $data = Drug::where('ndc', $ndc)->first(); // Get the first matching record
     if (!$data) {
         return back()->with('error', 'No drug found for the provided NDC.');
     }

@@ -43,39 +43,6 @@
     <div style="margin-to: -1333px">
     <h1>CDI Medication Guiding Tool 💊</h1>
     </div>
-   {{-- old one 
-    <form id="searchForm" method="post" action="{{ route('search')}}">
-        @csrf
-                <h1 class="text-center mb-4"></h1>
-
-        <div class="mb-3 w-100">
-
-        <label for="drugName">Drug Name:</label>
-        <select id="drugName" name="drug_name">
-            <option value="">-- Select Drug Name --</option>
-            @foreach($drugNames as $drugName)
-                <option value="{{ $drugName }}">{{ $drugName }}</option>
-            @endforeach
-        </select>
-        </div>
-        <div  class="mb-3 w-100"  id="relatedInputs" style="display: none;">
-            <label for="insurance">Insurance:</label>
-            <select id="insurance" name="insurance">
-                <option value="">-- Select Insurance --</option>
-            </select>
-        </div>
-        <div class="mb-3 w-100">
-
-            <label for="ndc">NDC:</label>
-            <select id="ndc" name="ndc">
-                <option value="">-- Select NDC --</option>
-            </select>
-        </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Search Drug</button>
-
-    </form>
-    --}}
   
     
     <form id="searchForm" method="post" action="{{ route('search')}}" class="d-flex flex-column align-items-center">
