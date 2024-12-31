@@ -219,19 +219,12 @@ public function filterData(Request $request)
                   ->orWhere('Ins', 'LIKE', "%($insurance)"); // Match short name
         })
         ->pluck('NDC');
-
-        $ndcs = Script::where('Drug_Name', $drugName)
-            ->where('Ins', $insurance) // Direct match
-                  ->orWhere('Ins', 'LIKE', "%($insurance)") // Match short name
-            ->pluck('NDC');
+      $ndcs = $filteredScriptData->pluck('NDC')->unique()->values();
 
     // Fallback to NDCs from filteredDrugData if no NDCs were found
     if ($ndcs->isEmpty()) {
-        $ndcs = Script::where('Drug_Name', $drugName)
-        ->where('Ins', $insurance) // Direct match
-              ->orWhere('Ins', 'LIKE', "%($insurance)") // Match short name
-        ->pluck('NDC');
-       $ndcs = $filteredScriptData->pluck('NDC')->unique()->values();
+        $ndcs = $filteredDrugData->pluck('ndc')->unique()->values();
+
     }
 
     // Return the response as JSON
@@ -241,7 +234,6 @@ public function filterData(Request $request)
         'ndcs' => $ndcs,
     ]);
 }
-
 
 public function processNdc(Request $request)
 {
@@ -253,9 +245,11 @@ public function processNdc(Request $request)
 
     // Normalize the input NDC (remove any dashes)
     $normalizedInputNdc = str_replace('-', '', $ndc);
-
+//dd($normalizedInputNdc);
     // Step 1: Find the drug name related to the provided NDC
-    $data = Drug::whereRaw("REPLACE(ndc, '-', '') = ?", [$normalizedInputNdc])->first();
+    $data = Drug::whereRaw("REPLACE(ndc, '-', '') = ?", [$normalizedInputNdc])
+    ->orWhere('ndc',$ndc)
+    ->first();
     
     // Step 1: Find the drug name related to the provided NDC
    // $data = Drug::where('ndc', $ndc)->first(); // Get the first matching record

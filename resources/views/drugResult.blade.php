@@ -34,7 +34,8 @@
 
             @elseif(isset($drug_data) && count($drug_data) > 0)
                 <th>Drug Name</th>
-                <th>NDC</th>
+                <th>NDC</th>               
+             <th>Class</th>
                 <th>Form</th>
                 <th>Strength</th>
                 <th>Manufacturer</th>
@@ -50,7 +51,7 @@
                 <tr>
                     <td>{{ $request->drug_name }}</td>
                     <td>{{ $request->insurance }}</td>
-                    <td>{{ $request->ndc }}</td>
+                    <td>{{ $item->NDC }}</td>
                     <td>{{ $class }}</td>
                     <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $item->Date)->format('m/d/Y') }}</td>
                     <td>{{ $item->Script }}</td>
@@ -67,7 +68,8 @@
             @foreach ($drug_data as $item)
                 <tr>
                     <td>{{ $request->drug_name }}</td>
-                    <td>{{ $request->ndc }}</td>
+                    <td>{{ $item->ndc }}</td>
+                    <td>{{ $item->drug_class }}</td>
                     <td>{{ $item->form }}</td>
                     <td>{{ $item->strength }}</td>
                     <td>{{ $item->mfg }}</td>
